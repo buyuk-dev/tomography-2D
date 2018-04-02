@@ -2,7 +2,7 @@
 
 import math
 import numpy
-import matplotlib
+import matplotlib.pyplot
 import skimage.io
 
 
@@ -12,7 +12,6 @@ RESOLUTION_A = 360                     # number of angular samples
 INIT_ANGLE = math.pi / 2.0
 
 DETECTORS = [
-    position_of(i, INIT_ANGLE)
 ]
 
 
@@ -24,8 +23,7 @@ def cast_ray(image, angle, detector):
     return 0.5
     
 
-
-
-
 if __name__ == '__main__':
-    print("Hello, world!")
+    img = load_object("img/circle01.jpeg")
+    matplotlib.pyplot.imshow(img)
+    matplotlib.pyplot.show()
