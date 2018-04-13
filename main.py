@@ -9,6 +9,12 @@ import itertools
 import math
 
 
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+
 IMG_BASE_PATH = "img"
 def get_path_to_object(object_name, extension="jpeg"):
     filename = object_name + "." + extension
@@ -18,8 +24,7 @@ def get_path_to_object(object_name, extension="jpeg"):
 RESOLUTION_D = 100 # number of detectors
 RESOLUTION_A = 360 # number of angular samples
 
-RADIATION_SOURCE = (0, 1000)
-
+ANGULAR_SPAN = math.pi / 4
 
 DETECTORS = [
 ]
@@ -36,10 +41,6 @@ def get_line_params(A, B):
     return a, b
 
 
-class Point:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
 
 
 def closed_range(beg, end, step):
@@ -77,6 +78,14 @@ def load_object(object_name):
     filename = get_path_to_object(object_name)
     return skimage.io.imread(filename, as_grey=True)
  
+
+def cast_ray(source, detector, space):
+    path = bresenham_segment(source, detector)
+    absorption = 0.0
+    for p in path:
+        absorption += space[p[0]][p[1]]
+    return absorption
+
 
 if __name__ == '__main__':
     img = load_object("circle01")
