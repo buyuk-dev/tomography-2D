@@ -8,26 +8,23 @@ import os
 import itertools
 import math
 
+from point import *
 
-class Point:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+
+DETECTORS_NUMBER = 10
+
+SAMPLING = 10
+
+ANGULAR_SPAN = math.pi / 4
+
+DETECTORS = [
+]
 
 
 IMG_BASE_PATH = "img"
 def get_path_to_object(object_name, extension="jpeg"):
     filename = object_name + "." + extension
     return os.path.join(IMG_BASE_PATH, filename)
-
-
-RESOLUTION_D = 100 # number of detectors
-RESOLUTION_A = 360 # number of angular samples
-
-ANGULAR_SPAN = math.pi / 4
-
-DETECTORS = [
-]
 
 
 def get_line_params(A, B):
@@ -39,8 +36,6 @@ def get_line_params(A, B):
     b = A.y - a * A.x
 
     return a, b
-
-
 
 
 def closed_range(beg, end, step):
@@ -87,17 +82,56 @@ def cast_ray(source, detector, space):
     return absorption
 
 
+def measure(source, detectors, space):
+    measurements = []
+    for detector in detectors:
+        absorption = cast_ray(source, detector, space)
+        measurements.append(absorption)
+    return measurements 
+
+
+def scan(source_angle, space, ndetectors=10, span=math.pi/4.0):
+    w = len(space) - 5
+    h = len(space[0]) - 5
+    center = Point(int(w/2), int(h/2))    
+    base = Point(int(w/2), 0)
+    source = base.rotate(center, source_angle) 
+
+    halfspan = span / 2.0
+    step = span / ndetectors
+    mid_angle = add_angle(source, math.pi)
+    detectors_apos = [math.pi - halfspan + k * step for k in range(0, ndetectors)]
+    detectors = [source.rotate(center, angle) for angle in detectors_apos]
+
+    return measure(source, detectors, space)
+
+
+def compute_sinogram(space, ndetectors, span):
+    w = len(space)
+    h = len(space[0])
+    base = Point(int(w/2)) - 5
+    source = Point(base.x, base.y)
+    
+     
+
+
 if __name__ == '__main__':
     img = load_object("circle01")
 
     w = len(img)
     h = len(img[0])
 
-    path = bresenham_segment(Point(50, 100), Point(25, 25))
-    for p in path:
-        print(p)
-        img[p[0]][p[1]] = 1.0
+    #source = Point(0, 140)
+    #detector = Point(224, 140)
+    #absorption = cast_ray(source, detector, img)
+    #print(absorption)
 
-    matplotlib.pyplot.imshow(img)
-    matplotlib.pyplot.show()
+    detectors = tomography(img)
+    for i in detectors:
+        print(i)
+    #for d in detectors:
+    #    img[d.x][d.y] = 1.0
+
+    #matplotlib.pyplot.imshow(img)
+    #matplotlib.pyplot.show()
 
