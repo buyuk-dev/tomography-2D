@@ -17,9 +17,6 @@ SAMPLING = 10
 
 ANGULAR_SPAN = math.pi / 4
 
-DETECTORS = [
-]
-
 
 IMG_BASE_PATH = "img"
 def get_path_to_object(object_name, extension="jpeg"):
@@ -99,20 +96,21 @@ def scan(source_angle, space, ndetectors=10, span=math.pi/4.0):
 
     halfspan = span / 2.0
     step = span / ndetectors
-    mid_angle = add_angle(source, math.pi)
-    detectors_apos = [math.pi - halfspan + k * step for k in range(0, ndetectors)]
+    detectors_apos = [source_angle + math.pi - halfspan + k * step for k in range(0, ndetectors)]
     detectors = [source.rotate(center, angle) for angle in detectors_apos]
 
     return measure(source, detectors, space)
 
 
-def compute_sinogram(space, ndetectors, span):
-    w = len(space)
-    h = len(space[0])
-    base = Point(int(w/2)) - 5
-    source = Point(base.x, base.y)
-    
-     
+def compute_sinogram(space, ndetectors, span,  nscans):
+    step = (math.pi * 2.0) / nscans
+    angles = [k * step for k in range(nscans)]
+
+    sinogram = []
+    for source_angle in angles:
+        measurements = scan(source_angle, space, ndetectors, span) 
+        sinogram.append(measurements)
+    return sinogram
 
 
 if __name__ == '__main__':
@@ -126,11 +124,10 @@ if __name__ == '__main__':
     #absorption = cast_ray(source, detector, img)
     #print(absorption)
 
-    detectors = tomography(img)
-    for i in detectors:
-        print(i)
-    #for d in detectors:
-    #    img[d.x][d.y] = 1.0
+    sinogram = compute_sinogram(img, 1000, math.pi/2, 1000)
+
+    matplotlib.pyplot.imshow(sinogram)
+    matplotlib.pyplot.show()
 
     #matplotlib.pyplot.imshow(img)
     #matplotlib.pyplot.show()
