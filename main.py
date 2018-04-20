@@ -7,21 +7,18 @@ import skimage.io
 import os
 import itertools
 import math
+import numpy
 
+import config
+import imgutils
 from point import *
+import loader
+import dummy
 
+import alg_sart # to implement
 
-DETECTORS_NUMBER = 10
-
-SAMPLING = 10
-
-ANGULAR_SPAN = math.pi / 4
-
-
-IMG_BASE_PATH = "img"
-def get_path_to_object(object_name, extension="jpeg"):
-    filename = object_name + "." + extension
-    return os.path.join(IMG_BASE_PATH, filename)
+space = None
+has_been_marked = False
 
 
 def get_line_params(A, B):
@@ -63,27 +60,29 @@ def bresenham_segment(A, B):
             y = round(yr)
             path.append((x, y))
 
-    return path
+    return path 
 
-
-def load_object(object_name):
-    filename = get_path_to_object(object_name)
-    return skimage.io.imread(filename, as_grey=True)
- 
-
-def cast_ray(source, detector, space):
+def cast_ray(source, detector):
+    global has_been_marked
+    global space
     path = bresenham_segment(source, detector)
     absorption = 0.0
     for p in path:
         absorption += space[p[0]][p[1]]
+        # mark path
+        if not has_been_marked:
+            space[p[0]][p[1]] = 0.5
     return absorption
 
 
 def measure(source, detectors, space):
+    global has_been_marked
     measurements = []
     for detector in detectors:
-        absorption = cast_ray(source, detector, space)
+        absorption = cast_ray(source, detector)
         measurements.append(absorption)
+        
+    has_been_marked = True
     return measurements 
 
 
@@ -114,21 +113,28 @@ def compute_sinogram(space, ndetectors, span,  nscans):
 
 
 if __name__ == '__main__':
-    img = load_object("circle01")
+    # space = loader.load_object("export", "png")
+    # space = imgutils.negative(space)
+    space = dummy.create_dummy_1()
+    w = len(space)
+    h = len(space[0])
 
-    w = len(img)
-    h = len(img[0])
+    nscans = 100
+    sinogram = compute_sinogram(space, 100, math.pi, nscans)
+     
+    fig = matplotlib.pyplot.figure()
+    fig.add_subplot(2, 2, 1)
+    matplotlib.pyplot.imshow(space)
 
-    #source = Point(0, 140)
-    #detector = Point(224, 140)
-    #absorption = cast_ray(source, detector, img)
-    #print(absorption)
-
-    sinogram = compute_sinogram(img, 1000, math.pi/2, 1000)
-
+    fig.add_subplot(2, 2, 2)   
     matplotlib.pyplot.imshow(sinogram)
+
+    angles = [k * ((math.pi * 2.0) / nscans) for k in range(nscans)]
+    reconstruction = alg_sart.sart(numpy.array(sinogram), numpy.array(angles))
+
+    fig.add_subplot(2, 2, 3)
+    matplotlib.pyplot.imshow(reconstruction)
+   
     matplotlib.pyplot.show()
 
-    #matplotlib.pyplot.imshow(img)
-    #matplotlib.pyplot.show()
 
