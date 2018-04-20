@@ -1,18 +1,13 @@
 #!/usr/local/bin/python3
 
-import math
 import numpy
 import matplotlib.pyplot
-import skimage.io
-import os
-import itertools
 import math
 import numpy
 
 import config
 import imgutils
-import  mathutils
-from point import *
+import mathutils
 import loader
 import dummy
 import bresenham
@@ -39,8 +34,8 @@ def measure(source, detectors, space):
 def scan(source_angle, space, ndetectors=10, span=math.pi/4.0):
     w = len(space) - 5
     h = len(space[0]) - 5
-    center = Point(int(w/2), int(h/2))    
-    base = Point(int(w/2), 0)
+    center = mathutils.Point(int(w/2), int(h/2))    
+    base = mathutils.Point(int(w/2), 0)
     source = base.rotate(center, source_angle) 
 
     halfspan = span / 2.0
@@ -65,7 +60,6 @@ def compute_sinogram(space, ndetectors, span,  nscans):
 if __name__ == '__main__':
     # space = loader.load_object("export", "png")
     # space = imgutils.negative(space)
-
     space = dummy.create_dummy_1()
 
     nscans = 100
