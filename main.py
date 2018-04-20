@@ -11,78 +11,28 @@ import numpy
 
 import config
 import imgutils
+import  mathutils
 from point import *
 import loader
 import dummy
+import bresenham
 
 import alg_sart # to implement
 
-space = None
-has_been_marked = False
 
-
-def get_line_params(A, B):
-    if B.x == A.x:
-        # line is parallel to OY axis.
-        return None
-
-    a = (B.y - A.y) / (B.x - A.x)
-    b = A.y - a * A.x
-
-    return a, b
-
-
-def closed_range(beg, end, step):
-    if step > 0:
-        return range(beg, end + 1, step)
-    else:
-        return range(beg, end - 1, step)
-
-
-def bresenham_segment(A, B):
-    if A.x > B.x:
-        tmp = A
-        A = B
-        B = tmp
-
-    line = get_line_params(A, B) 
-
-    path = []
-    for x in closed_range(A.x, B.x, 1):
-        if line is None:
-            direction = 1
-            if A.y > B.y:
-                direction = -1
-            for y in closed_range(A.y, B.y, direction):
-                path.append((x, y))
-        else:
-            yr = line[0] * x + line[1]
-            y = round(yr)
-            path.append((x, y))
-
-    return path 
-
-def cast_ray(source, detector):
-    global has_been_marked
-    global space
-    path = bresenham_segment(source, detector)
+def cast_ray(source, detector, space):
+    path = bresenham.bresenham_segment(source, detector)
     absorption = 0.0
     for p in path:
         absorption += space[p[0]][p[1]]
-        # mark path
-        if not has_been_marked:
-            space[p[0]][p[1]] = 0.5
     return absorption
 
 
 def measure(source, detectors, space):
-    global has_been_marked
     measurements = []
     for detector in detectors:
-        absorption = cast_ray(source, detector)
-        measurements.append(absorption)
-        
-    has_been_marked = True
+        absorption = cast_ray(source, detector, space)
+        measurements.append(absorption)    
     return measurements 
 
 
@@ -115,9 +65,8 @@ def compute_sinogram(space, ndetectors, span,  nscans):
 if __name__ == '__main__':
     # space = loader.load_object("export", "png")
     # space = imgutils.negative(space)
+
     space = dummy.create_dummy_1()
-    w = len(space)
-    h = len(space[0])
 
     nscans = 100
     sinogram = compute_sinogram(space, 100, math.pi, nscans)
@@ -136,5 +85,4 @@ if __name__ == '__main__':
     matplotlib.pyplot.imshow(reconstruction)
    
     matplotlib.pyplot.show()
-
 
