@@ -14,9 +14,14 @@ import bresenham
 
 import alg_sart # to implement
 
+space = None
 
-def cast_ray(source, detector, space):
+def cast_ray(source, detector, _placeholder):
+    global space
+    global is_marked
     path = bresenham.bresenham_segment(source, detector)
+    #for p in path:
+    #    space[p[0]][p[1]] = 200
     absorption = 0.0
     for p in path:
         absorption += space[p[0]][p[1]]
@@ -40,8 +45,11 @@ def scan(source_angle, space, ndetectors=10, span=math.pi/4.0):
 
     halfspan = span / 2.0
     step = span / ndetectors
-    detectors_apos = [source_angle + math.pi - halfspan + k * step for k in range(0, ndetectors)]
-    detectors = [source.rotate(center, angle) for angle in detectors_apos]
+    detectors_apos = [
+        source_angle + math.pi - halfspan + k * step 
+        for k in range(0, ndetectors)
+    ]
+    detectors = [base.rotate(center, angle) for angle in detectors_apos]
 
     return measure(source, detectors, space)
 
@@ -57,23 +65,60 @@ def compute_sinogram(space, ndetectors, span,  nscans):
     return sinogram
 
 
-if __name__ == '__main__':
-    # space = loader.load_object("export", "png")
-    # space = imgutils.negative(space)
-    space = dummy.create_dummy_1()
+class Tomograph:
+    def __init__(self):
+        self.resolution = 100
+        self.span = math.pi
+        self.sampling = 100
 
+    def scan(self, space):
+        self.space = space
+        self.sinogram = compute_sinogram(
+            self.space, 
+            self.resolution,
+            self.span,
+            self.sampling
+        ) 
+
+    def construct(self):
+        angles = [k * ((math.pi * 2.0) / self.sampling) 
+                  for k in range(self.sampling)]
+        return alg_sart.sart(numpy.array(self.sinogram), numpy.array(angles))
+         
+
+def display(img):
+    matplotlib.pyplot.imshow(img)
+    matplotlib.pyplot.show()
+
+
+if __name__ == '__main__':
+    space = loader.load_object("circle01", "jpeg")
+    t = Tomograph()
+
+    display(space)
+
+    t.scan(space)
+    display(t.sinogram)
+ 
+    rec = t.construct()
+    display(rec)
+
+
+def foo():
+    space = loader.load_object("circle01", "jpeg")
+    
     nscans = 100
     sinogram = compute_sinogram(space, 100, math.pi, nscans)
-     
+         
     fig = matplotlib.pyplot.figure()
     fig.add_subplot(2, 2, 1)
     matplotlib.pyplot.imshow(space)
 
     fig.add_subplot(2, 2, 2)   
     matplotlib.pyplot.imshow(sinogram)
-
-    angles = [k * ((math.pi * 2.0) / nscans) for k in range(nscans)]
-    reconstruction = alg_sart.sart(numpy.array(sinogram), numpy.array(angles))
+    print("sinogram computed.")
+ 
+    print("reconstruction completed.")
 
     fig.add_subplot(2, 2, 3)
     matplotlib.pyplot.imshow(reconstruction)
