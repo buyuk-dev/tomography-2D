@@ -92,8 +92,11 @@ def display(img):
 
 
 if __name__ == '__main__':
-    space = loader.load_object("circle01", "jpeg")
+
     t = Tomograph()
+    
+    space = loader.load_object("circle01", "jpeg")
+    space = imgutils.scale_canvas(space, 100, 100)
 
     display(space)
 
@@ -105,23 +108,14 @@ if __name__ == '__main__':
 
 
 def foo():
-    space = loader.load_object("circle01", "jpeg")
-    
-    nscans = 100
-    sinogram = compute_sinogram(space, 100, math.pi, nscans)
-         
     fig = matplotlib.pyplot.figure()
     fig.add_subplot(2, 2, 1)
     matplotlib.pyplot.imshow(space)
 
     fig.add_subplot(2, 2, 2)   
     matplotlib.pyplot.imshow(sinogram)
-    print("sinogram computed.")
- 
-    print("reconstruction completed.")
 
     fig.add_subplot(2, 2, 3)
     matplotlib.pyplot.imshow(reconstruction)
    
-    matplotlib.pyplot.show()
 
