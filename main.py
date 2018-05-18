@@ -172,34 +172,30 @@ def apply_filter(sinogram, ndetectors):
 
 if __name__ == '__main__':
 
+    fig = matplotlib.pyplot.figure()
+
     t = Tomograph()
     
-    space = loader.load_object("circle01", "jpeg")
-    ow, oh = len(space[0]), len(space)
-    space = imgutils.scale_canvas(space, 100, 100)
-
-    t.scan(space)
-    t.sinogram = apply_filter(t.sinogram, t.resolution)
-    #t.sinogram = filter_sinogram(t.sinogram)
-    #t.sinogram = imgutils.reject_extremes(t.sinogram, 25)
-    display(t.sinogram)
-   
-    rec = t.backprop()
-    rec = imgutils.cut(rec, 50, 50, ow, oh)
-    #rec = imgutils.reject_extremes(rec, int((ow * oh) / 200.0))
-    #rec = convolve2d(numpy.array(rec), numpy.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]]))
-    display(rec)
-
-
-def foo():
-    fig = matplotlib.pyplot.figure()
+    space = loader.load_object("phantom", "png")
     fig.add_subplot(2, 2, 1)
     matplotlib.pyplot.imshow(space)
 
-    fig.add_subplot(2, 2, 2)   
-    matplotlib.pyplot.imshow(sinogram)
+    ow, oh = len(space[0]), len(space)
+    space = imgutils.scale_canvas(space, 100, 100)
 
+
+    t.scan(space)
+    fig.add_subplot(2, 2, 2)
+    matplotlib.pyplot.imshow(t.sinogram)
+
+    t.sinogram = apply_filter(t.sinogram, t.resolution)
     fig.add_subplot(2, 2, 3)
-    matplotlib.pyplot.imshow(reconstruction)
+    matplotlib.pyplot.imshow(t.sinogram)
    
+    rec = t.backprop()
+    rec = imgutils.cut(rec, 50, 50, ow, oh)
+    fig.add_subplot(2, 2, 4)
+    matplotlib.pyplot.imshow(rec)
+
+    matplotlib.pyplot.show()
 
