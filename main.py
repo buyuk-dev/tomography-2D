@@ -12,8 +12,6 @@ import loader
 import dummy
 import bresenham
 
-import alg_sart # to implement
-
 
 def cast_ray(space, source, detector, _placeholder):
     path = bresenham.bresenham_segment(source, detector)
@@ -116,6 +114,21 @@ def display(img):
     matplotlib.pyplot.show()
 
 
+def compute_ramp(ndetectors):
+    L = ndetectors * 2
+    h = numpy.zeros(L)
+    L2 = L // 2 + 1
+    h[0] = 1/4.
+    j = numpy.linspace(1, L2, L2//2, False)
+    # h[2::2] = 0
+    h[1:L2:2] = -1./(math.pi**2 * j**2)
+    #h[-1:L2-1:-2] = -1./(pi**2 * j**2)
+    h[L2:] = numpy.copy(h[1:L2-1][::-1])
+    _ramp = h * 2.0
+    return numpy.abs(numpy.fft.fft(_ramp))
+    
+
+
 def convolve2d(image, kernel):
     kernel = numpy.flipud(numpy.fliplr(kernel))
     output = numpy.zeros_like(image)
@@ -128,6 +141,35 @@ def convolve2d(image, kernel):
     return output
 
 
+def normalize_row(row):
+    pass
+
+
+def normalize_sinogram(sinogram):
+    norm = []
+    for row in sinogram:
+        norm.append(normalize_row(row, maximum))
+    return norm
+
+
+def filter_sinogram(sinogram, threshold=0):
+    filtered = []
+    for row in sinogram:
+        fd = numpy.fft.fft(row)
+        fd = [elem if elem > threshold else 0 for elem in row]
+        sd = numpy.fft.ifft(fd).real
+        print(sd)
+        filtered.append(sd) 
+    return filtered
+
+
+def apply_filter(sinogram, ndetectors):
+    ramp = compute_ramp(ndetectors)
+    l_x = ndetectors
+    filtered = numpy.fft.ifft(ramp * numpy.fft.fft(sinogram, 2*l_x, axis=1), axis=1)[:,:l_x].real
+    return filtered
+
+
 if __name__ == '__main__':
 
     t = Tomograph()
@@ -136,14 +178,16 @@ if __name__ == '__main__':
     ow, oh = len(space[0]), len(space)
     space = imgutils.scale_canvas(space, 100, 100)
 
-    t.scan(space) 
-    t.sinogram = imgutils.reject_extremes(t.sinogram, 25)
+    t.scan(space)
+    t.sinogram = apply_filter(t.sinogram, t.resolution)
+    #t.sinogram = filter_sinogram(t.sinogram)
+    #t.sinogram = imgutils.reject_extremes(t.sinogram, 25)
     display(t.sinogram)
    
     rec = t.backprop()
     rec = imgutils.cut(rec, 50, 50, ow, oh)
     #rec = imgutils.reject_extremes(rec, int((ow * oh) / 200.0))
-    rec = convolve2d(numpy.array(rec), numpy.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]]))
+    #rec = convolve2d(numpy.array(rec), numpy.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]]))
     display(rec)
 
 
