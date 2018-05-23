@@ -101,11 +101,6 @@ class Tomograph:
                     img[p[0]][p[1]] += row[i]
         return img
 
-    def construct(self):
-        angles = [k * ((math.pi) / self.sampling) 
-                  for k in range(self.sampling)]
-        return alg_sart.sart(numpy.array(self.sinogram), numpy.array(angles))
-         
 
 if __name__ == '__main__':
 
