@@ -7,10 +7,9 @@
 + Run script `python main.py'
 + Wait until processing is done. Results will be displayed in matplotlib window.
 
-Sample result screenshot:
 ![tomography 2D sample results screenshot][screenshot]
 
 
 
-[screenshot]: https://github.com/buyuk-dev/tomography-2D/blob/master/phantom_scan_01_grey.png
+[screenshot]: https://github.com/buyuk-dev/tomography-2D/blob/master/phantom_scan_01_grey.png "Sample results"
 
