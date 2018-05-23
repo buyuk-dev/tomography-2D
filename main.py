@@ -12,6 +12,7 @@ import loader
 import dummy
 import bresenham
 import ramp
+import backprop
 
 
 def cast_ray(space, source, detector, _placeholder):
@@ -62,9 +63,9 @@ def compute_sinogram(space, ndetectors, span,  nscans):
 
 class Tomograph:
     def __init__(self):
-        self.resolution = 500
+        self.resolution = 200
         self.span = math.pi
-        self.sampling = 500
+        self.sampling = 200
 
     def scan(self, space):
         self.space = space
@@ -76,53 +77,29 @@ class Tomograph:
         ) 
         return self.sinogram
 
-    def backprop(self):
-        height, width = len(self.space), len(self.space[0])
-        img = [[0] * width for row in self.space]
-
-        step = (math.pi * 2.0) / self.sampling
-        angles = [k * step for k in range(self.sampling)]
-
-        for row, source_angle in zip(self.sinogram, angles):
-            w = len(space) - 5
-            h = len(space[0]) - 5
-            center = mathutils.Point(int(w/2), int(h/2))    
-            base = mathutils.Point(int(w/2), 0)
-            source = base.rotate(center, source_angle) 
-            halfspan = self.span / 2.0
-            step = self.span / self.resolution
-            detectors_apos = [
-                source_angle + math.pi - halfspan + k * step 
-                for k in range(0, self.resolution)
-            ]
-            detectors = [base.rotate(center, angle) for angle in detectors_apos]
-            for i, detector in enumerate(detectors):
-                path = bresenham.bresenham_segment(source, detector)
-                for p in path:
-                    img[p[0]][p[1]] += row[i]
-        return img
-
 
 if __name__ == '__main__':
- 
-    space = loader.load_object("phantom", "png")
+
+    # load object
+    original = loader.load_object("phantom", "png")
+    ow, oh = len(original[0]), len(original)
 
     # run simulation
-    ow, oh = len(space[0]), len(space)
-    space = imgutils.scale_canvas(space, 100, 100)
+    space = imgutils.scale_canvas(original, 100, 100)
+    sw, sh = len(space[0]), len(space)
 
     t = Tomograph()
     sinogram = t.scan(space)
     t.sinogram = ramp.filter(sinogram, t.resolution)
     filtered_sinogram = t.sinogram
-    reconstruction = t.backprop()
+    reconstruction = backprop.backprop(t.sinogram, (sh, sw), t.sampling, t.span, t.resolution)
     reconstruction = imgutils.cut(reconstruction, 50, 50, ow, oh)
 
     # display results
     fig = matplotlib.pyplot.figure()
 
     fig.add_subplot(2, 2, 1)
-    matplotlib.pyplot.imshow(space, cmap="gray")
+    matplotlib.pyplot.imshow(original, cmap="gray")
 
     fig.add_subplot(2, 2, 2)
     matplotlib.pyplot.imshow(sinogram, cmap="gray")
