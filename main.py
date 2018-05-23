@@ -74,6 +74,7 @@ class Tomograph:
             self.span,
             self.sampling
         ) 
+        return self.sinogram
 
     def backprop(self):
         height, width = len(self.space), len(self.space[0])
@@ -103,29 +104,34 @@ class Tomograph:
 
 
 if __name__ == '__main__':
-
-    fig = matplotlib.pyplot.figure()
  
     space = loader.load_object("phantom", "png")
-    fig.add_subplot(2, 2, 1)
-    matplotlib.pyplot.imshow(space, cmap="gray")
 
+    # run simulation
     ow, oh = len(space[0]), len(space)
     space = imgutils.scale_canvas(space, 100, 100)
 
     t = Tomograph()
-    t.scan(space)
-    fig.add_subplot(2, 2, 2)
-    matplotlib.pyplot.imshow(t.sinogram, cmap="gray")
+    sinogram = t.scan(space)
+    t.sinogram = ramp.filter(sinogram, t.resolution)
+    filtered_sinogram = t.sinogram
+    reconstruction = t.backprop()
+    reconstruction = imgutils.cut(reconstruction, 50, 50, ow, oh)
 
-    t.sinogram = ramp.filter(t.sinogram, t.resolution)
+    # display results
+    fig = matplotlib.pyplot.figure()
+
+    fig.add_subplot(2, 2, 1)
+    matplotlib.pyplot.imshow(space, cmap="gray")
+
+    fig.add_subplot(2, 2, 2)
+    matplotlib.pyplot.imshow(sinogram, cmap="gray")
+
     fig.add_subplot(2, 2, 3)
-    matplotlib.pyplot.imshow(t.sinogram, cmap="gray")
+    matplotlib.pyplot.imshow(filtered_sinogram, cmap="gray")
    
-    rec = t.backprop()
-    rec = imgutils.cut(rec, 50, 50, ow, oh)
     fig.add_subplot(2, 2, 4)
-    matplotlib.pyplot.imshow(rec, cmap="gray")
+    matplotlib.pyplot.imshow(reconstruction, cmap="gray")
 
     matplotlib.pyplot.show()
 
