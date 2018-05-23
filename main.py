@@ -3,7 +3,8 @@
 import numpy
 import matplotlib.pyplot
 import math
-import numpy
+import sys
+
 
 import config
 import imgutils
@@ -80,8 +81,13 @@ class Tomograph:
 
 if __name__ == '__main__':
 
+    filename, extension = "phantom", "png"
+    if len(sys.argv) == 2:
+        print("loading {}".format(sys.argv[1]))
+        filename, extension = sys.argv[1].split(".")
+
     # load object
-    original = loader.load_object("phantom", "png")
+    original = loader.load_object(filename, extension)
     ow, oh = len(original[0]), len(original)
 
     # run simulation
