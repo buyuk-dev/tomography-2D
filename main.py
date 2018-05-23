@@ -64,9 +64,14 @@ def compute_sinogram(space, ndetectors, span,  nscans):
 
 class Tomograph:
     def __init__(self):
-        self.resolution = 200
+        # SAMPLING --> RMS
+        # 100 --> 59.43232439784853
+        # 200 --> 49.46973185844213 
+        # 300 --> 45.221974151266984
+        # 400 --> 43.991697831156316
+        self.resolution = 300
         self.span = math.pi
-        self.sampling = 200
+        self.sampling = 100
 
     def scan(self, space):
         self.space = space
@@ -100,6 +105,11 @@ if __name__ == '__main__':
     filtered_sinogram = t.sinogram
     reconstruction = backprop.backprop(t.sinogram, (sh, sw), t.sampling, t.span, t.resolution)
     reconstruction = imgutils.cut(reconstruction, 50, 50, ow, oh)
+
+    norm_original = mathutils.normalize(numpy.array(original), (0.0, 255.0))
+    norm_reconstr = mathutils.normalize(numpy.array(reconstruction), (0.0, 255.0))
+    rms = mathutils.rms_error(norm_original, norm_reconstr)
+    print("RMS = {}".format(rms))
 
     # display results
     fig = matplotlib.pyplot.figure()

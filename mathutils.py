@@ -1,4 +1,5 @@
 import math
+import numpy
 
 
 def get_line_params(A, B):
@@ -39,3 +40,16 @@ class Point:
         y = ny + center.y
 
         return Point(round(x), round(y))
+
+
+def rms_error(X, Y):
+    assert X.shape == Y.shape
+    diff = X - Y
+    square = sum(sum(diff ** 2))
+    n = X.shape[0] * X.shape[1]
+    return numpy.sqrt(square/ n)
+
+
+def normalize(X, out_range=(0.0, 1.0)):
+    return numpy.interp(X, (X.min(), X.max()), out_range)
+
