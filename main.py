@@ -82,7 +82,6 @@ class Tomograph:
         angles = [k * step for k in range(self.sampling)]
 
         for row, source_angle in zip(self.sinogram, angles):
-            print("backprop angle {}".format(source_angle))
             w = len(space) - 5
             h = len(space[0]) - 5
             center = mathutils.Point(int(w/2), int(h/2))    
@@ -100,8 +99,6 @@ class Tomograph:
                 for p in path:
                     img[p[0]][p[1]] += row[i]
         return img
-           
-            
 
     def construct(self):
         angles = [k * ((math.pi) / self.sampling) 
@@ -120,37 +117,11 @@ def compute_ramp(ndetectors):
     L2 = L // 2 + 1
     h[0] = 1/4.
     j = numpy.linspace(1, L2, L2//2, False)
-    # h[2::2] = 0
     h[1:L2:2] = -1./(math.pi**2 * j**2)
-    #h[-1:L2-1:-2] = -1./(pi**2 * j**2)
     h[L2:] = numpy.copy(h[1:L2-1][::-1])
     _ramp = h * 2.0
     return numpy.abs(numpy.fft.fft(_ramp))
     
-
-
-def convolve2d(image, kernel):
-    kernel = numpy.flipud(numpy.fliplr(kernel))
-    output = numpy.zeros_like(image)
-    
-    image_padded = numpy.zeros((image.shape[0] + 2, image.shape[1] + 2))   
-    image_padded[1:-1, 1:-1] = image
-    for x in range(image.shape[1]):
-        for y in range(image.shape[0]):
-            output[y,x]=(kernel*image_padded[y:y+3,x:x+3]).sum()        
-    return output
-
-
-def normalize_row(row):
-    pass
-
-
-def normalize_sinogram(sinogram):
-    norm = []
-    for row in sinogram:
-        norm.append(normalize_row(row, maximum))
-    return norm
-
 
 def filter_sinogram(sinogram, threshold=0):
     filtered = []
