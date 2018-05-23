@@ -11,6 +11,7 @@ import mathutils
 import loader
 import dummy
 import bresenham
+import ramp
 
 
 def cast_ray(space, source, detector, _placeholder):
@@ -106,47 +107,10 @@ class Tomograph:
         return alg_sart.sart(numpy.array(self.sinogram), numpy.array(angles))
          
 
-def display(img):
-    matplotlib.pyplot.imshow(img, cmap="gray")
-    matplotlib.pyplot.show()
-
-
-def compute_ramp(ndetectors):
-    L = ndetectors * 2
-    h = numpy.zeros(L)
-    L2 = L // 2 + 1
-    h[0] = 1/4.
-    j = numpy.linspace(1, L2, L2//2, False)
-    h[1:L2:2] = -1./(math.pi**2 * j**2)
-    h[L2:] = numpy.copy(h[1:L2-1][::-1])
-    _ramp = h * 2.0
-    return numpy.abs(numpy.fft.fft(_ramp))
-    
-
-def filter_sinogram(sinogram, threshold=0):
-    filtered = []
-    for row in sinogram:
-        fd = numpy.fft.fft(row)
-        fd = [elem if elem > threshold else 0 for elem in row]
-        sd = numpy.fft.ifft(fd).real
-        print(sd)
-        filtered.append(sd) 
-    return filtered
-
-
-def apply_filter(sinogram, ndetectors):
-    ramp = compute_ramp(ndetectors)
-    l_x = ndetectors
-    filtered = numpy.fft.ifft(ramp * numpy.fft.fft(sinogram, 2*l_x, axis=1), axis=1)[:,:l_x].real
-    return filtered
-
-
 if __name__ == '__main__':
 
     fig = matplotlib.pyplot.figure()
-
-    t = Tomograph()
-    
+ 
     space = loader.load_object("phantom", "png")
     fig.add_subplot(2, 2, 1)
     matplotlib.pyplot.imshow(space, cmap="gray")
@@ -154,11 +118,12 @@ if __name__ == '__main__':
     ow, oh = len(space[0]), len(space)
     space = imgutils.scale_canvas(space, 100, 100)
 
+    t = Tomograph()
     t.scan(space)
     fig.add_subplot(2, 2, 2)
     matplotlib.pyplot.imshow(t.sinogram, cmap="gray")
 
-    t.sinogram = apply_filter(t.sinogram, t.resolution)
+    t.sinogram = ramp.filter(t.sinogram, t.resolution)
     fig.add_subplot(2, 2, 3)
     matplotlib.pyplot.imshow(t.sinogram, cmap="gray")
    
