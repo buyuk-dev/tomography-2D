@@ -1,7 +1,7 @@
 2D tomography simulation using radon transform and reconstruction with summary method (backpropagation).
 
 
-# 1. Usage
+# Usage
 
 + Prepare square image in greyscale and move it to img/phantom.png
 + Run script `python main.py'
