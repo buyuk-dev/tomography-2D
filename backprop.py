@@ -27,5 +27,5 @@ def backprop(sinogram, size, sampling, span, resolution):
             path = bresenham.bresenham_segment(source, detector)
             for p in path:
                 img[p[0]][p[1]] += row[i]
-    return img
+    return numpy.array(img)
 
