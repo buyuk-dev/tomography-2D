@@ -24,7 +24,7 @@ def scan(angle, space, ndetectors, span):
 
     measurements = []
     for detector in detectors:
-        path = numpy.array(bresenham.bresenham_segment(source, detector))
+        path = bresenham.bresenham_segment(source, detector)
         measurements.append(space[path[:,0], path[:,1]].sum())
 
     return measurements

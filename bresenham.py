@@ -1,37 +1,42 @@
 import mathutils
+import numpy
 
 
-def plotLineLow(x0,y0, x1,y1):
-    dx = x1 - x0
-    dy = y1 - y0
+def plotLineLow(A, B):
+    dx, dy = (B.x - A.x), (B.y - A.y)
+    
     yi = 1
     if dy < 0:
         yi = -1
         dy = -dy
-    D = 2*dy - dx
-    y = y0
+
+    D = 2 * dy - dx
+    y = A.y
 
     path = []
-    for x in mathutils.closed_range(x0, x1, 1):
+    for x in range(A.x, B.x + 1):
         path.append((x, y))
         if D > 0:
            y = y + yi
            D = D - 2*dx
+
         D = D + 2*dy
+
     return path
 
-def plotLineHigh(x0,y0, x1,y1):
-    dx = x1 - x0
-    dy = y1 - y0
+
+def plotLineHigh(A, B):
+    dx, dy = (B.x - A.x), (B.y - A.y)
+
     xi = 1
     if dx < 0:
         xi = -1
         dx = -dx
     D = 2*dx - dy
-    x = x0
+    x = A.x
 
     path = []
-    for y in mathutils.closed_range(y0, y1, 1):
+    for y in range(A.y, B.y + 1):
         path.append((x, y))
         if D > 0:
             x = x + xi
@@ -39,19 +44,17 @@ def plotLineHigh(x0,y0, x1,y1):
         D = D + 2*dx
     return path
 
-def plotLine(x0,y0, x1,y1):
-    if abs(y1 - y0) < abs(x1 - x0):
-        if x0 > x1:
-            return plotLineLow(x1, y1, x0, y0)
-        else:
-            return plotLineLow(x0, y0, x1, y1)
-    else:
-        if y0 > y1:
-            return plotLineHigh(x1, y1, x0, y0)
-        else:
-            return plotLineHigh(x0, y0, x1, y1)
-
 
 def bresenham_segment(A, B):
-    return plotLine(A.x, A.y, B.x, B.y)
+    if abs(B.y - A.y) < abs(B.x - A.x):
+        if A.x > B.x:
+            path = plotLineLow(B, A)
+        else:
+            path = plotLineLow(A, B)
+    else:
+        if A.y > B.y:
+            path = plotLineHigh(B, A)
+        else:
+            path = plotLineHigh(A, B)
+    return numpy.array(path)
 
