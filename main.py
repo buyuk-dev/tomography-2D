@@ -2,7 +2,6 @@
 
 import numpy
 import matplotlib.pyplot
-import sys
 import argparse
 
 import skimage.io
@@ -20,12 +19,14 @@ def parse_args():
     args = parser.parse_args()
     return args 
 
+def load_image_normalized(path):
+    image = skimage.io.imread(cmd_args.path, as_grey=True)
+    return numpy.interp(original, (original.min(), original.max()), (0, 255))
 
 def main():
     cmd_args = parse_args()
 
-    original = skimage.io.imread(cmd_args.path, as_grey=True)
-    original = numpy.interp(original, (original.min(), original.max()), (0, 255))
+    original = load_image_normalized(cmd_args.path)
 
     space = numpy.pad(original, 50, 'constant')
     t = tomo.Tomograph()
