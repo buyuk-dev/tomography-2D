@@ -21,8 +21,7 @@ def parse_args():
     return args 
 
 
-if __name__ == '__main__':
-
+def main():
     cmd_args = parse_args()
 
     original = skimage.io.imread(cmd_args.path, as_grey=True)
@@ -47,4 +46,8 @@ if __name__ == '__main__':
     fig.add_subplot(2, 2, 4)
     matplotlib.pyplot.imshow(rec, cmap="gray")
     matplotlib.pyplot.show()
+
+
+if __name__ == '__main__':
+    main()
 
