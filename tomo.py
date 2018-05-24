@@ -1,41 +1,33 @@
 import numpy
-
-import mathutils
 import bresenham
+from mathutils import Point
 
 
-def cast_ray(space, source, detector, _placeholder):
-    path = bresenham.bresenham_segment(source, detector)
-    absorption = 0.0
-    for p in path:
-        absorption += space[p[0]][p[1]]
-    return absorption
+def scan(angle, space, ndetectors, span):
+    w, h = space.shape
 
+    center = Point(w // 2, h // 2)    
+    zero = Point(w // 2, 1)
 
-def measure(source, detectors, space):
-    measurements = []
-    for detector in detectors:
-        absorption = cast_ray(space, source, detector, space)
-        measurements.append(absorption)    
-    return measurements 
-
-
-def scan(source_angle, space, ndetectors=10, span=numpy.pi/4.0):
-    w = len(space) - 5
-    h = len(space[0]) - 5
-    center = mathutils.Point(int(w/2), int(h/2))    
-    base = mathutils.Point(int(w/2), 0)
-    source = base.rotate(center, source_angle) 
-
-    halfspan = span / 2.0
+    source = zero.rotate(center, angle) 
     step = span / ndetectors
-    detectors_apos = [
-        source_angle + numpy.pi - halfspan + k * step 
+
+    detectors = [
+        angle + numpy.pi - (span / 2.0) + (k * step)
         for k in range(0, ndetectors)
     ]
-    detectors = [base.rotate(center, angle) for angle in detectors_apos]
 
-    return measure(source, detectors, space)
+    detectors = [
+        zero.rotate(center, detector) 
+        for detector in detectors
+    ]
+
+    measurements = []
+    for detector in detectors:
+        path = numpy.array(bresenham.bresenham_segment(source, detector))
+        measurements.append(space[path[:,0], path[:,1]].sum())
+
+    return measurements
 
 
 class Tomograph:
