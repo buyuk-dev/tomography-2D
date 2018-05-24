@@ -8,7 +8,6 @@ import argparse
 import skimage.io
 
 import mathutils
-import dummy
 
 import ramp
 import backprop
@@ -25,35 +24,27 @@ def parse_args():
 if __name__ == '__main__':
 
     cmd_args = parse_args()
+
     original = skimage.io.imread(cmd_args.path, as_grey=True)
+    original = numpy.interp(original, (original.min(), original.max()), (0, 255))
 
     space = numpy.pad(original, 50, 'constant')
-
     t = tomo.Tomograph()
-    sinogram = t.scan(space)
-    t.sinogram = ramp.filter(sinogram, t.resolution)
-    filtered_sinogram = t.sinogram
-    reconstruction = backprop.backprop(t.sinogram, space.shape, t.sampling, t.span, t.resolution)
-    reconstruction = reconstruction[50:-50,50:-50]
+    t.scan(space)
+    filtered = ramp.filter(t.sinogram, t.resolution)
+    rec = backprop.backprop(filtered, space.shape, t.sampling, t.span, t.resolution)
+    rec = rec[50:-50,50:-50]
+    rec = numpy.interp(rec, (rec.min(), rec.max()), (0, 255))
 
-    norm_original = mathutils.normalize(original, (0.0, 255.0))
-    norm_reconstr = mathutils.normalize(reconstruction, (0.0, 255.0))
-    rms = mathutils.rms_error(norm_original, norm_reconstr)
-
-    # display results
+    rms = mathutils.rms_error(original, rec)
     fig = matplotlib.pyplot.figure()
-
     fig.add_subplot(2, 2, 1)
     matplotlib.pyplot.imshow(original, cmap="gray")
-
     fig.add_subplot(2, 2, 2)
-    matplotlib.pyplot.imshow(sinogram, cmap="gray")
-
+    matplotlib.pyplot.imshow(t.sinogram, cmap="gray")
     fig.add_subplot(2, 2, 3)
-    matplotlib.pyplot.imshow(filtered_sinogram, cmap="gray")
-   
+    matplotlib.pyplot.imshow(filtered, cmap="gray")
     fig.add_subplot(2, 2, 4)
-    matplotlib.pyplot.imshow(reconstruction, cmap="gray")
-
+    matplotlib.pyplot.imshow(rec, cmap="gray")
     matplotlib.pyplot.show()
 
