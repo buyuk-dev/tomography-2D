@@ -1,5 +1,4 @@
 import numpy
-import math
 
 import mathutils
 import bresenham
@@ -21,7 +20,7 @@ def measure(source, detectors, space):
     return measurements 
 
 
-def scan(source_angle, space, ndetectors=10, span=math.pi/4.0):
+def scan(source_angle, space, ndetectors=10, span=numpy.pi/4.0):
     w = len(space) - 5
     h = len(space[0]) - 5
     center = mathutils.Point(int(w/2), int(h/2))    
@@ -31,7 +30,7 @@ def scan(source_angle, space, ndetectors=10, span=math.pi/4.0):
     halfspan = span / 2.0
     step = span / ndetectors
     detectors_apos = [
-        source_angle + math.pi - halfspan + k * step 
+        source_angle + numpy.pi - halfspan + k * step 
         for k in range(0, ndetectors)
     ]
     detectors = [base.rotate(center, angle) for angle in detectors_apos]
@@ -39,36 +38,21 @@ def scan(source_angle, space, ndetectors=10, span=math.pi/4.0):
     return measure(source, detectors, space)
 
 
-def compute_sinogram(space, ndetectors, span,  nscans):
-    step = (math.pi * 2.0) / nscans
-    angles = [k * step for k in range(nscans)]
-
-    sinogram = []
-    for i, source_angle in enumerate(angles):
-        print("source_angle: {} {}".format(source_angle, i))
-        measurements = scan(source_angle, space, ndetectors, span) 
-        sinogram.append(measurements)
-    return sinogram
-
-
 class Tomograph:
+
     def __init__(self):
-        # SAMPLING --> RMS
-        # 100 --> 59.43232439784853
-        # 200 --> 49.46973185844213 
-        # 300 --> 45.221974151266984
-        # 400 --> 43.991697831156316
         self.resolution = 300
-        self.span = math.pi
         self.sampling = 100
+        self.span = numpy.pi
+
+        step = (numpy.pi * 2.0) / self.sampling
+        self.angles = [k * step for k in range(self.sampling)]
 
     def scan(self, space):
         self.space = space
-        self.sinogram = compute_sinogram(
-            self.space, 
-            self.resolution,
-            self.span,
-            self.sampling
-        ) 
+        self.sinogram = [
+            scan(angle, self.space, self.resolution, self.span)
+            for angle in self.angles
+        ] 
         return self.sinogram
 
