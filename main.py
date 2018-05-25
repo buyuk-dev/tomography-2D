@@ -7,7 +7,6 @@ import skimage.io
 
 import mathutils
 import ramp
-import backprop
 import tomo
 
 
@@ -44,13 +43,25 @@ def main():
     space = numpy.pad(original, 50, 'constant')
 
     t = tomo.Tomograph()
+    print("[config]")
+    print("{} = {}".format("resolution", t.resolution))
+    print("{} = {}".format("span", t.span))
+    print("{} = {}".format("sampling", t.sampling))
+    print("{} = {}".format("image", cmd_args.path))
+    print("{} = {}".format("size", original.shape))
+    print("------------")
+
     t.scan(space)
+    print("scan done")
     filtered = ramp.filter(t.sinogram, t.resolution)
-    rec = backprop.backprop(filtered, space.shape, t.sampling, t.span, t.resolution)
+    print("ramp filter applied")
+    rec = tomo.backprop(filtered, space.shape, t.sampling, t.span, t.resolution)
+    print("reconstruction finished")
     rec = rec[50:-50,50:-50]
     rec = numpy.interp(rec, (rec.min(), rec.max()), (0, 255))
 
     rms = mathutils.rms_error(original, rec)
+    print("RMS = {}".format(rms))
 
     plotter = Plotter((2,2))
     plotter.plot(original, 1)
