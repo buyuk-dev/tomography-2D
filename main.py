@@ -2,6 +2,8 @@
 
 import argparse
 import numpy
+
+import matplotlib
 import matplotlib.pyplot
 import skimage.io
 
@@ -36,10 +38,8 @@ class Plotter:
         matplotlib.pyplot.show()
 
 
-def main():
-    cmd_args = parse_args()
-
-    original = load_image_normalized(cmd_args.path)
+def main(path):
+    original = load_image_normalized(path)
     space = numpy.pad(original, 50, 'constant')
 
     t = tomo.Tomograph()
@@ -47,7 +47,7 @@ def main():
     print("{} = {}".format("resolution", t.resolution))
     print("{} = {}".format("span", t.span))
     print("{} = {}".format("sampling", t.sampling))
-    print("{} = {}".format("image", cmd_args.path))
+    print("{} = {}".format("image", path))
     print("{} = {}".format("size", original.shape))
     print("------------")
 
@@ -72,5 +72,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    cmd_args = parse_args()
+    main(cmd_args.path)
 
