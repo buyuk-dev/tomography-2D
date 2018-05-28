@@ -1,43 +1,45 @@
-import matplotlib as mpl
-import matplotlib.pyplot as plt
+import matplotlib.pyplot
 import numpy as np
-import tkinter as tk
-import matplotlib.backends.tkagg as tkagg
-from matplotlib.backends.backend_agg import FigureCanvasAgg
+import tkinter
+import gui_utils
+import main
 
 
-def draw_figure(canvas, figure, loc=(0, 0)):
-    figure_canvas_agg = FigureCanvasAgg(figure)
-    figure_canvas_agg.draw()
-
-    x,y,w,h = figure.bbox.bounds
-    w, h = int(w), int(h)
-    photo = tk.PhotoImage(master=canvas, width=w, height=h)
-
-    canvas.create_image(loc[0] + w // 2, loc[1] + h // 2, image=photo)
-    tkagg.blit(photo, figure_canvas_agg.get_renderer()._renderer, colormode=2)
-
-    return photo
-
-
+# Create window
 w, h = 640, 480
-window = tk.Tk()
+window = tkinter.Tk()
 window.title("A figure in a canvas")
+window.protocol("WM_DELETE_WINDOW", window.quit)
 
-
-canvas = tk.Canvas(window, width=w, height=h)
+# Create canvas
+canvas = tkinter.Canvas(window, width=w, height=h)
 canvas.pack()
 
+fig_pic = None
 
-# my code starts
-myfig = plt.figure()
-plt.plot([x*x for x in range(100)])
-fig_pic = draw_figure(canvas, myfig)
-# my code ends
+def on_click():
+    global fig_pic
 
-btn = tk.Button(window, text="click", command=window.destroy)
+    original, sinogram, filtered, rec = main.main("img/phantom.png")
+
+    myfig = matplotlib.pyplot.figure()
+    myfig.add_subplot(2, 2, 1)
+    matplotlib.pyplot.imshow(original, cmap='gray')
+    myfig.add_subplot(2,2,2)
+    matplotlib.pyplot.imshow(rec, cmap='gray')
+    myfig.add_subplot(2,2,3)
+    matplotlib.pyplot.imshow(sinogram, cmap='gray')
+    myfig.add_subplot(2,2,4)
+    matplotlib.pyplot.imshow(filtered, cmap='gray')
+
+    fig_pic = gui_utils.draw_figure(canvas, myfig)
+
+
+btn = tkinter.Button(text="scan", command=on_click)
 btn.pack()
 
-tk.mainloop()
+
+
+tkinter.mainloop()
 
 

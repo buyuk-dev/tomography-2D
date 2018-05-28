@@ -43,6 +43,7 @@ def main(path):
     space = numpy.pad(original, 50, 'constant')
 
     t = tomo.Tomograph()
+
     print("[config]")
     print("{} = {}".format("resolution", t.resolution))
     print("{} = {}".format("span", t.span))
@@ -63,12 +64,14 @@ def main(path):
     rms = mathutils.rms_error(original, rec)
     print("RMS = {}".format(rms))
 
-    plotter = Plotter((2,2))
-    plotter.plot(original, 1)
-    plotter.plot(t.sinogram, 2)
-    plotter.plot(filtered, 3)
-    plotter.plot(rec, 4)
-    plotter.show()
+    return original, t.sinogram, filtered, rec
+
+    #plotter = Plotter((2,2))
+    #plotter.plot(original, 1)
+    #plotter.plot(t.sinogram, 2)
+    #plotter.plot(filtered, 3)
+    #plotter.plot(rec, 4)
+    #plotter.show()
 
 
 if __name__ == '__main__':
