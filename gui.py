@@ -18,7 +18,7 @@ class GuiApp:
         self.canvas = tkinter.Canvas(self.root, width=640, height=480)
         self.canvas.pack()
 
-        self.btn = tkinter.Button(text="scan", higcommand=lambda: self.on_scan())
+        self.btn = tkinter.Button(text="scan", command=lambda: self.on_scan())
         self.btn.pack()
 
         self.progress_bar = tkinter.ttk.Progressbar(orient=tkinter.HORIZONTAL, length=100, mode='determinate')
