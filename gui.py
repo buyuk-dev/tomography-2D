@@ -5,53 +5,52 @@ import gui_utils
 import main
 
 
-# Create window
-w, h = 640, 480
-window = tkinter.Tk()
-window.title("A figure in a canvas")
-window.protocol("WM_DELETE_WINDOW", window.quit)
+class GuiApp:
 
-# Create canvas
-canvas = tkinter.Canvas(window, width=w, height=h)
-canvas.pack()
+    def __init__(self):
+        self.root = tkinter.Tk()
+        self.root.title("Tomography 2D")
+        self.root.protocol("WM_DELETE_WINDOW", self.root.quit)
 
-fig_pic = None
+        self.figure = None
 
-def on_click():
-    global fig_pic
-    global pathEntry
-    
-    path = pathEntry.get()
-    pathEntry.delete(0, tkinter.END)
+        self.canvas = tkinter.Canvas(self.root, width=640, height=480)
+        self.canvas.pack()
 
-    original, sinogram, filtered, rec = main.main(path)
+        self.btn = tkinter.Button(text="scan", command=lambda: self.on_scan())
+        self.btn.pack()
 
-    myfig = matplotlib.pyplot.figure()
-    myfig.add_subplot(2, 2, 1)
-    matplotlib.pyplot.title('input')
-    matplotlib.pyplot.imshow(original, cmap='gray')
+        self.path_entry = tkinter.Entry()
+        self.path_entry.pack()
 
-    myfig.add_subplot(2,2,2)
-    matplotlib.pyplot.title('reconstruction')
-    matplotlib.pyplot.imshow(rec, cmap='gray')
+    def on_scan(self):
+        path = self.path_entry.get()
+        self.path_entry.delete(0, tkinter.END)
 
-    myfig.add_subplot(2,2,3)
-    matplotlib.pyplot.title('sinogram')
-    matplotlib.pyplot.imshow(sinogram, cmap='gray')
+        original, sinogram, filtered, rec = main.main(path)
 
-    myfig.add_subplot(2,2,4)
-    matplotlib.pyplot.title('filtered sinogram') 
-    matplotlib.pyplot.imshow(filtered, cmap='gray')
+        myfig = matplotlib.pyplot.figure()
+        myfig.add_subplot(2, 2, 1)
+        matplotlib.pyplot.title(path)
+        matplotlib.pyplot.imshow(original, cmap='gray')
 
-    fig_pic = gui_utils.draw_figure(canvas, myfig)
+        myfig.add_subplot(2,2,2)
+        matplotlib.pyplot.title('reconstruction')
+        matplotlib.pyplot.imshow(rec, cmap='gray')
 
+        myfig.add_subplot(2,2,3)
+        matplotlib.pyplot.title('sinogram')
+        matplotlib.pyplot.imshow(sinogram, cmap='gray')
 
-btn = tkinter.Button(text="scan", command=on_click)
-btn.pack()
+        myfig.add_subplot(2,2,4)
+        matplotlib.pyplot.title('filtered sinogram') 
+        matplotlib.pyplot.imshow(filtered, cmap='gray')
 
-pathEntry = tkinter.Entry()
-pathEntry.pack()
-
-tkinter.mainloop()
+        self.figure = gui_utils.draw_figure(self.canvas, myfig)
+        
+    def run(self):
+        tkinter.mainloop()
 
 
+app = GuiApp()
+app.run()
