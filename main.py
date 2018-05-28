@@ -66,15 +66,15 @@ def main(path):
 
     return original, t.sinogram, filtered, rec
 
-    #plotter = Plotter((2,2))
-    #plotter.plot(original, 1)
-    #plotter.plot(t.sinogram, 2)
-    #plotter.plot(filtered, 3)
-    #plotter.plot(rec, 4)
-    #plotter.show()
 
 
 if __name__ == '__main__':
     cmd_args = parse_args()
-    main(cmd_args.path)
+    original, sinogram, filtered, rec = main(cmd_args.path)
 
+    plotter = Plotter((2,2))
+    plotter.plot(original, 1)
+    plotter.plot(sinogram, 2)
+    plotter.plot(filtered, 3)
+    plotter.plot(rec, 4)
+    plotter.show()
