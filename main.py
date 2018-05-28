@@ -34,6 +34,7 @@ class Plotter:
         self.figure.add_subplot(*self.grid, n)
         if title is not None:
             matplotlib.pyplot.title(title)
+            matplotlib.pyplot.axis("off")
         matplotlib.pyplot.imshow(data, cmap=self.cmap)
 
     def show(self):

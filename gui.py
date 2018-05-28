@@ -22,7 +22,23 @@ class GuiApp:
         self.btn.pack()
 
         self.path_entry = tkinter.Entry()
+        self.path_entry.insert(0, "image path")
         self.path_entry.pack()
+
+        self.sampling_entry = tkinter.Entry()
+        self.sampling_entry.insert(0, "sampling")
+        self.sampling_entry.pack()
+
+        self.resolution_entry = tkinter.Entry()
+        self.resolution_entry.insert(0, "resolution")
+        self.resolution_entry.pack()
+
+        self.span_entry = tkinter.Entry()
+        self.span_entry.insert(0, "span")
+        self.span_entry.pack()
+        
+        self.rms_label = tkinter.Label(text="RMS: N/A")
+        self.rms_label.pack()
 
         self.progress_bar = tkinter.ttk.Progressbar(self.root, orient=tkinter.HORIZONTAL, length=100, mode='determinate')
         self.progress_bar.pack()
