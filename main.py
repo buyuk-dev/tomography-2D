@@ -41,10 +41,10 @@ class Plotter:
         matplotlib.pyplot.show()
 
 
-def main(path, progress_cb):
+def main(path, app):
     original = load_image_normalized(path)
     space = numpy.pad(original, 50, 'constant')
-
+    app.increment_progress()
     t = tomo.Tomograph()
 
     print("[config]")
@@ -56,18 +56,23 @@ def main(path, progress_cb):
     print("------------")
 
     t.scan(space)
+    app.increment_progress(30)
     print("scan done")
-
+    
     filtered = ramp.filter(t.sinogram, t.resolution)
+    app.increment_progress()
     print("ramp filter applied")
 
     rec = tomo.backprop(filtered, space.shape, t.sampling, t.span, t.resolution)
+    app.increment_progress(30)
     print("reconstruction finished")
 
     rec = rec[50:-50,50:-50]
     rec = numpy.interp(rec, (rec.min(), rec.max()), (0, 255))
+    app.increment_progress()
 
     rms = mathutils.rms_error(original, rec)
+    app.increment_progress()
     print("RMS = {}".format(rms))
 
     return original, t.sinogram, filtered, rec

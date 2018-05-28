@@ -1,3 +1,4 @@
+import threading
 import matplotlib.pyplot
 import numpy as np
 import tkinter
@@ -44,28 +45,32 @@ class GuiApp:
         self.span_entry.insert(0, "span")
         self.span_entry.pack(side=tkinter.LEFT)
         
-        self.rms_label = tkinter.Label(text="RMS: N/A", width=20)
+        self.rms_label = tkinter.Label(text="RMS: N/A", fg="red", width=20)
         self.rms_label.pack()
+    
+        def scan():
+            path = self.path_entry.get()
+            self.path_entry.delete(0, tkinter.END)
+            original, sinogram, filtered, rec = main.main(path, self) 
+            
+            plotter = main.Plotter((2,2))
+            plotter.plot(original, 1, path) 
+            plotter.plot(rec, 2, 'reconstruction')
+            plotter.plot(sinogram, 3, 'sinogram')
+            plotter.plot(filtered, 4, 'filtered sinogram')
+        
+            self.figure = gui_utils.draw_figure(self.canvas, plotter.figure)
+
+        self.worker = threading.Thread(target=scan)
 
 
-    def increment_progress(self):
-        self.progress_bar.step(10)
+    def increment_progress(self, val=10):
+        self.progress_bar.step(val)
         if self.progress_bar['value'] == self.progress_bar['maximum']:
             print("scanning completed")
 
     def on_scan(self):
-        path = self.path_entry.get()
-        self.path_entry.delete(0, tkinter.END)
-
-        original, sinogram, filtered, rec = main.main(path, lambda: self.increment_progress())
-
-        plotter = main.Plotter((2,2))
-        plotter.plot(original, 1, path) 
-        plotter.plot(rec, 2, 'reconstruction')
-        plotter.plot(sinogram, 3, 'sinogram')
-        plotter.plot(filtered, 4, 'filtered sinogram')
-    
-        self.figure = gui_utils.draw_figure(self.canvas, plotter.figure)
+        self.worker.start()
         
     def run(self):
         tkinter.mainloop()
