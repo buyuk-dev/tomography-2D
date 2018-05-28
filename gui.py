@@ -47,7 +47,9 @@ class GuiApp:
         
         self.rms_label = tkinter.Label(text="RMS: N/A", fg="red", width=20)
         self.rms_label.pack()
-    
+
+        # TODO: this causes problems, looks like i cannot call mpl or tkinter
+        #       functions from threads other than main
         def scan():
             path = self.path_entry.get()
             self.path_entry.delete(0, tkinter.END)
