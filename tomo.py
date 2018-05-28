@@ -34,7 +34,7 @@ class Tomograph:
 
     def __init__(self):
         self.resolution = 300
-        self.sampling = 100
+        self.sampling = 300
         self.span = numpy.pi
 
         step = (numpy.pi * 2.0) / self.sampling

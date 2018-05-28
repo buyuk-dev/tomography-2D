@@ -19,17 +19,28 @@ fig_pic = None
 
 def on_click():
     global fig_pic
+    global pathEntry
+    
+    path = pathEntry.get()
+    pathEntry.delete(0, tkinter.END)
 
-    original, sinogram, filtered, rec = main.main("img/phantom.png")
+    original, sinogram, filtered, rec = main.main(path)
 
     myfig = matplotlib.pyplot.figure()
     myfig.add_subplot(2, 2, 1)
+    matplotlib.pyplot.title('input')
     matplotlib.pyplot.imshow(original, cmap='gray')
+
     myfig.add_subplot(2,2,2)
+    matplotlib.pyplot.title('reconstruction')
     matplotlib.pyplot.imshow(rec, cmap='gray')
+
     myfig.add_subplot(2,2,3)
+    matplotlib.pyplot.title('sinogram')
     matplotlib.pyplot.imshow(sinogram, cmap='gray')
+
     myfig.add_subplot(2,2,4)
+    matplotlib.pyplot.title('filtered sinogram') 
     matplotlib.pyplot.imshow(filtered, cmap='gray')
 
     fig_pic = gui_utils.draw_figure(canvas, myfig)
@@ -38,7 +49,8 @@ def on_click():
 btn = tkinter.Button(text="scan", command=on_click)
 btn.pack()
 
-
+pathEntry = tkinter.Entry()
+pathEntry.pack()
 
 tkinter.mainloop()
 
