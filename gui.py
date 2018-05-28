@@ -18,31 +18,35 @@ class GuiApp:
         self.canvas = tkinter.Canvas(self.root, width=640, height=480)
         self.canvas.pack()
 
-        self.btn = tkinter.Button(text="scan", command=lambda: self.on_scan())
+        self.btn = tkinter.Button(text="scan", higcommand=lambda: self.on_scan())
         self.btn.pack()
 
-        self.path_entry = tkinter.Entry()
+        self.progress_bar = tkinter.ttk.Progressbar(orient=tkinter.HORIZONTAL, length=100, mode='determinate')
+        self.progress_bar.pack(fill=tkinter.X)
+        self.progress = 0
+
+        self.path_entry = tkinter.Entry(width=50)
         self.path_entry.insert(0, "image path")
         self.path_entry.pack()
 
-        self.sampling_entry = tkinter.Entry()
+        self.frame_params = tkinter.Frame()
+        self.frame_params.pack()
+
+        self.sampling_entry = tkinter.Entry(self.frame_params, width=10)
         self.sampling_entry.insert(0, "sampling")
-        self.sampling_entry.pack()
+        self.sampling_entry.pack(side=tkinter.LEFT)
 
-        self.resolution_entry = tkinter.Entry()
+        self.resolution_entry = tkinter.Entry(self.frame_params, width=10)
         self.resolution_entry.insert(0, "resolution")
-        self.resolution_entry.pack()
+        self.resolution_entry.pack(side=tkinter.LEFT)
 
-        self.span_entry = tkinter.Entry()
+        self.span_entry = tkinter.Entry(self.frame_params, width=10)
         self.span_entry.insert(0, "span")
-        self.span_entry.pack()
+        self.span_entry.pack(side=tkinter.LEFT)
         
-        self.rms_label = tkinter.Label(text="RMS: N/A")
+        self.rms_label = tkinter.Label(text="RMS: N/A", width=20)
         self.rms_label.pack()
 
-        self.progress_bar = tkinter.ttk.Progressbar(self.root, orient=tkinter.HORIZONTAL, length=100, mode='determinate')
-        self.progress_bar.pack()
-        self.progress = 0
 
     def increment_progress(self):
         self.progress_bar.step(10)
