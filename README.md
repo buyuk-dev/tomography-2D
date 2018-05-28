@@ -3,9 +3,11 @@
 
 # Usage
 
-+ Prepare square image in greyscale and move it to img/phantom.png
-+ Run script `python main.py'
-+ Wait until processing is done. Results will be displayed in matplotlib window.
++ Prepare square image in greyscale
++ Run script `python gui.py`
++ Type path to the prepared image into a text field
++ Click *scan* button to start simulation
++ Wait until processing is done (progress will be displayed in command line)
 
 ![tomography 2D sample results screenshot][screenshot]
 
