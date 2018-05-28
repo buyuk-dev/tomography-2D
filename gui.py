@@ -1,6 +1,7 @@
 import matplotlib.pyplot
 import numpy as np
 import tkinter
+import tkinter.ttk
 import gui_utils
 import main
 
@@ -23,11 +24,20 @@ class GuiApp:
         self.path_entry = tkinter.Entry()
         self.path_entry.pack()
 
+        self.progress_bar = tkinter.ttk.Progressbar(self.root, orient=tkinter.HORIZONTAL, length=100, mode='determinate')
+        self.progress_bar.pack()
+        self.progress = 0
+
+    def increment_progress(self):
+        self.progress_bar.step(10)
+        if self.progress_bar['value'] == self.progress_bar['maximum']:
+            print("scanning completed")
+
     def on_scan(self):
         path = self.path_entry.get()
         self.path_entry.delete(0, tkinter.END)
 
-        original, sinogram, filtered, rec = main.main(path)
+        original, sinogram, filtered, rec = main.main(path, lambda: self.increment_progress())
 
         plotter = main.Plotter((2,2))
         plotter.plot(original, 1, path) 

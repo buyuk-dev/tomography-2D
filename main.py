@@ -40,7 +40,7 @@ class Plotter:
         matplotlib.pyplot.show()
 
 
-def main(path):
+def main(path, progress_cb):
     original = load_image_normalized(path)
     space = numpy.pad(original, 50, 'constant')
 
@@ -56,10 +56,13 @@ def main(path):
 
     t.scan(space)
     print("scan done")
+
     filtered = ramp.filter(t.sinogram, t.resolution)
     print("ramp filter applied")
+
     rec = tomo.backprop(filtered, space.shape, t.sampling, t.span, t.resolution)
     print("reconstruction finished")
+
     rec = rec[50:-50,50:-50]
     rec = numpy.interp(rec, (rec.min(), rec.max()), (0, 255))
 
