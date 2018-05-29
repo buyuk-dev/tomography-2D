@@ -9,5 +9,5 @@
 + Click *scan* button to start simulation
 + Wait until processing is done (progress will be displayed in command line)
 
-<img src="https://github.com/buyuk-dev/tomography-2D/blob/master/screenshot.png" alt="screenshot" width="200">
+<img src="https://github.com/buyuk-dev/tomography-2D/blob/master/screenshot.png" alt="screenshot" width="400">
 
