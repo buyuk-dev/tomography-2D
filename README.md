@@ -5,7 +5,12 @@
 
 + Prepare square image in greyscale
 + Run script `python gui.py`
-+ Type path to the prepared image into a text field
++ Configuration parameters:
+    + path - path to input image
+    + resolution - number of detectors
+    + sampling - how many different angles should be scanned
+    + span - radiation cone angular span in radians (usually 3.141 should be fine)
+    + filter - if checked ramp filter will be applied to sinogram before reconstruction
 + Click *scan* button to start simulation
 + Wait until processing is done (progress will be displayed in command line)
 
