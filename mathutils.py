@@ -2,13 +2,6 @@ import math
 import numpy
 
 
-def closed_range(beg, end, step):
-    if step > 0:
-        return range(beg, end + 1, step)
-    else:
-        return range(beg, end - 1, step)
-
-
 class Point:
 
     def __init__(self, x, y):
