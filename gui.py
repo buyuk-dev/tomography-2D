@@ -7,6 +7,7 @@ import tkinter.ttk
 import gui_utils
 import main
 import plotter
+import os
 
 
 class GuiApp:
@@ -28,10 +29,15 @@ class GuiApp:
         self.progress_bar.pack(fill=tkinter.X)
         self.progress = 0
 
-        self.path_entry = tkinter.Entry(width=50)
-        self.path_entry.insert(0, "image path")
-        self.path_entry.pack()
+        def select_file():
+            self.filename = tkinter.filedialog.askopenfilename(
+                initialdir=os.path.abspath(os.curdir),
+                title='select image'
+            )
 
+        self.path_entry = tkinter.Button(text="browse", command=select_file)
+        self.path_entry.pack()            
+    
         self.frame_params = tkinter.Frame()
         self.frame_params.pack()
 
@@ -65,7 +71,7 @@ class GuiApp:
                 original, sinogram, filtered, rec, rms = self.data_queue.get()
                 self.rms_label['text'] = str(rms)
                 plt = plotter.Plotter((2,2))
-                plt.plot(original, 1, self.cfg.path) 
+                plt.plot(original, 1, self.cfg.path.split("/")[-1]) 
                 plt.plot(rec, 2, 'reconstruction')
                 plt.plot(sinogram, 3, 'sinogram')
                 plt.plot(filtered, 4, 'filtered sinogram')
@@ -82,7 +88,7 @@ class GuiApp:
         cfg = Config()
         cfg.filter = self.filter_switch_value.get()
         cfg.span = float(self.span_entry.get())
-        cfg.path = self.path_entry.get()
+        cfg.path = self.filename
         cfg.resolution = int(self.resolution_entry.get())
         cfg.sampling = int(self.sampling_entry.get())
         self.cfg = cfg
