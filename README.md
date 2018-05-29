@@ -6,7 +6,8 @@
 + Prepare square image in greyscale
 + Run script `python gui.py`
 + Configuration parameters
-|------------|--------------------------------------------------------------------------|
+| param      | description                                                              |
+| ---------- | ------------------------------------------------------------------------ |
 | path       | path to input image                                                      |
 | resolution | number of detectors                                                      |
 | sampling   | how many different angles should be scanned                              |
