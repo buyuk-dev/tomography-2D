@@ -1,4 +1,4 @@
-2D tomography simulation using radon transform and reconstruction with summary method (backpropagation).
+2D tomography simulation using radon transform and reconstruction by summation of projections (backpropagation method).
 
 
 # Usage
