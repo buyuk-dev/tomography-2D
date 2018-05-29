@@ -10,6 +10,7 @@ import skimage.io
 import mathutils
 import ramp
 import tomo
+import plotter
 
 
 def parse_args():
@@ -22,23 +23,6 @@ def parse_args():
 def load_image_normalized(path):
     image = skimage.io.imread(path, as_grey=True)
     return numpy.interp(image, (image.min(), image.max()), (0, 255))
-
-
-class Plotter:
-    def __init__(self, grid):
-        self.grid = grid
-        self.cmap = 'gray'
-        self.figure = matplotlib.pyplot.figure()
-
-    def plot(self, data, n, title=None):  
-        self.figure.add_subplot(*self.grid, n)
-        if title is not None:
-            matplotlib.pyplot.title(title)
-            matplotlib.pyplot.axis("off")
-        matplotlib.pyplot.imshow(data, cmap=self.cmap)
-
-    def show(self):
-        matplotlib.pyplot.show()
 
 
 def main(path, app):
@@ -83,9 +67,9 @@ if __name__ == '__main__':
     cmd_args = parse_args()
     original, sinogram, filtered, rec = main(cmd_args.path)
 
-    plotter = Plotter((2,2))
-    plotter.plot(original, 1)
-    plotter.plot(sinogram, 2)
-    plotter.plot(filtered, 3)
-    plotter.plot(rec, 4)
-    plotter.show()
+    plt = plotter.Plotter((2,2))
+    plt.plot(original, 1)
+    plt.plot(sinogram, 2)
+    plt.plot(filtered, 3)
+    plt.plot(rec, 4)
+    plt.show()

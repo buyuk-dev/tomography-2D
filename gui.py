@@ -1,10 +1,12 @@
 import threading
+import queue
 import matplotlib.pyplot
 import numpy as np
 import tkinter
 import tkinter.ttk
 import gui_utils
 import main
+import plotter
 
 
 class GuiApp:
@@ -44,28 +46,52 @@ class GuiApp:
         self.span_entry = tkinter.Entry(self.frame_params, width=10)
         self.span_entry.insert(0, "span")
         self.span_entry.pack(side=tkinter.LEFT)
-        
+      
+        self.filter_switch_value = tkinter.StringVar() 
+        self.filter_switch = tkinter.Checkbutton(
+            self.frame_params, 
+            text="filter",
+            variable=self.filter_switch_value,
+            onvalue="RAMP",
+            offvalue=None
+            )
+        self.filter_switch.pack(side=tkinter.LEFT) 
+ 
         self.rms_label = tkinter.Label(text="RMS: N/A", fg="red", width=20)
         self.rms_label.pack()
+ 
+        def poll_queue():
+            if not self.data_queue.empty():
+                original, sinogram, filtered, rec = self.data_queue.get()
+                plt = plotter.Plotter((2,2))
+                plt.plot(original, 1, self.path_entry.get()) 
+                plt.plot(rec, 2, 'reconstruction')
+                plt.plot(sinogram, 3, 'sinogram')
+                plt.plot(filtered, 4, 'filtered sinogram')
+                self.figure = gui_utils.draw_figure(self.canvas, plt.figure)
+            self.root.after(100, poll_queue)
 
-        # TODO: this causes problems, looks like i cannot call mpl or tkinter
-        #       functions from threads other than main
+        self.root.after(100, poll_queue)
+
         def scan():
-            path = self.path_entry.get()
-            self.path_entry.delete(0, tkinter.END)
-            original, sinogram, filtered, rec = main.main(path, self) 
-            
-            plotter = main.Plotter((2,2))
-            plotter.plot(original, 1, path) 
-            plotter.plot(rec, 2, 'reconstruction')
-            plotter.plot(sinogram, 3, 'sinogram')
-            plotter.plot(filtered, 4, 'filtered sinogram')
-        
-            self.figure = gui_utils.draw_figure(self.canvas, plotter.figure)
+            cfg = self.read_config()
+            data = main.main(cfg.path, self)
+            self.data_queue.put(data)
 
         self.worker = threading.Thread(target=scan)
+        self.data_queue = queue.Queue()
 
-
+    def read_config(self):
+        class Config:
+            pass
+        cfg = Config()
+        cfg.filter = self.filter_switch_value.get()
+        cfg.span = self.span_entry.get()
+        cfg.path = self.path_entry.get()
+        cfg.resolution = self.resolution_entry.get()
+        cfg.sampling = self.sampling_entry.get()
+        return cfg
+ 
     def increment_progress(self, val=10):
         self.progress_bar.step(val)
         if self.progress_bar['value'] == self.progress_bar['maximum']:
