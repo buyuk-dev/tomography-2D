@@ -62,7 +62,8 @@ class GuiApp:
  
         def poll_queue():
             if not self.data_queue.empty():
-                original, sinogram, filtered, rec = self.data_queue.get()
+                original, sinogram, filtered, rec, rms = self.data_queue.get()
+                self.rms_label['text'] = str(rms)
                 plt = plotter.Plotter((2,2))
                 plt.plot(original, 1, self.cfg.path) 
                 plt.plot(rec, 2, 'reconstruction')
@@ -80,10 +81,10 @@ class GuiApp:
             pass
         cfg = Config()
         cfg.filter = self.filter_switch_value.get()
-        cfg.span = self.span_entry.get()
+        cfg.span = float(self.span_entry.get())
         cfg.path = self.path_entry.get()
-        cfg.resolution = self.resolution_entry.get()
-        cfg.sampling = self.sampling_entry.get()
+        cfg.resolution = int(self.resolution_entry.get())
+        cfg.sampling = int(self.sampling_entry.get())
         self.cfg = cfg
  
     def increment_progress(self, val=10):

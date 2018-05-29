@@ -29,7 +29,7 @@ def main(cfg, app):
     original = load_image_normalized(cfg.path)
     space = numpy.pad(original, 50, 'constant')
     app.increment_progress()
-    t = tomo.Tomograph()
+    t = tomo.Tomograph(cfg.resolution, cfg.sampling, cfg.span)
 
     print("[config]")
     print("{} = {}".format("resolution", t.resolution))
@@ -47,7 +47,11 @@ def main(cfg, app):
     app.increment_progress()
     print("ramp filter applied")
 
-    rec = tomo.backprop(filtered, space.shape, t.sampling, t.span, t.resolution)
+    if cfg.filter == "RAMP":
+        print("RAMP filter enabled")
+        rec = tomo.backprop(filtered, space.shape, t.sampling, t.span, t.resolution)
+    else:
+        rec = tomo.backprop(t.sinogram, space.shape, t.sampling, t.span, t.resolution)
     app.increment_progress(30)
     print("reconstruction finished")
 
@@ -59,13 +63,13 @@ def main(cfg, app):
     app.increment_progress()
     print("RMS = {}".format(rms))
 
-    return original, t.sinogram, filtered, rec
+    return original, t.sinogram, filtered, rec, rms
 
 
 
 if __name__ == '__main__':
     cmd_args = parse_args()
-    original, sinogram, filtered, rec = main(cmd_args)
+    original, sinogram, filtered, rec, rms = main(cmd_args)
 
     plt = plotter.Plotter((2,2))
     plt.plot(original, 1)

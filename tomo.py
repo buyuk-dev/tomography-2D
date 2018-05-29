@@ -32,10 +32,10 @@ def scan(angle, space, ndetectors, span):
 
 class Tomograph:
 
-    def __init__(self):
-        self.resolution = 300
-        self.sampling = 300
-        self.span = numpy.pi
+    def __init__(self, resolution, sampling, span):
+        self.resolution = resolution
+        self.sampling = sampling
+        self.span = span
 
         step = (numpy.pi * 2.0) / self.sampling
         self.angles = [k * step for k in range(self.sampling)]
