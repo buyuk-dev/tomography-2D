@@ -13,5 +13,5 @@
 
 
 
-[screenshot]: https://github.com/buyuk-dev/tomography-2D/blob/master/phantom_scan_01_grey.png "Sample results"
+[screenshot]: https://github.com/buyuk-dev/tomography-2D/blob/master/screenshot.png "sample screenshot"
 
