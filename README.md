@@ -13,5 +13,5 @@
 
 
 
-[screenshot]: https://github.com/buyuk-dev/tomography-2D/blob/master/screenshot.png "sample screenshot"
+[screenshot]: (https://github.com/buyuk-dev/tomography-2D/blob/master/screenshot.png "sample screenshot" | width=200)
 
