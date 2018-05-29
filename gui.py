@@ -64,7 +64,7 @@ class GuiApp:
             if not self.data_queue.empty():
                 original, sinogram, filtered, rec = self.data_queue.get()
                 plt = plotter.Plotter((2,2))
-                plt.plot(original, 1, self.path_entry.get()) 
+                plt.plot(original, 1, self.cfg.path) 
                 plt.plot(rec, 2, 'reconstruction')
                 plt.plot(sinogram, 3, 'sinogram')
                 plt.plot(filtered, 4, 'filtered sinogram')
@@ -73,12 +73,6 @@ class GuiApp:
 
         self.root.after(100, poll_queue)
 
-        def scan():
-            cfg = self.read_config()
-            data = main.main(cfg.path, self)
-            self.data_queue.put(data)
-
-        self.worker = threading.Thread(target=scan)
         self.data_queue = queue.Queue()
 
     def read_config(self):
@@ -90,7 +84,7 @@ class GuiApp:
         cfg.path = self.path_entry.get()
         cfg.resolution = self.resolution_entry.get()
         cfg.sampling = self.sampling_entry.get()
-        return cfg
+        self.cfg = cfg
  
     def increment_progress(self, val=10):
         self.progress_bar.step(val)
@@ -98,7 +92,14 @@ class GuiApp:
             print("scanning completed")
 
     def on_scan(self):
-        self.worker.start()
+        def scan():
+            try:
+                self.read_config()
+                data = main.main(self.cfg, self)
+                self.data_queue.put(data)
+            except Exception as e:
+                print(e)
+        threading.Thread(target=scan).start()
         
     def run(self):
         tkinter.mainloop()

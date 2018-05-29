@@ -25,8 +25,8 @@ def load_image_normalized(path):
     return numpy.interp(image, (image.min(), image.max()), (0, 255))
 
 
-def main(path, app):
-    original = load_image_normalized(path)
+def main(cfg, app):
+    original = load_image_normalized(cfg.path)
     space = numpy.pad(original, 50, 'constant')
     app.increment_progress()
     t = tomo.Tomograph()
@@ -35,7 +35,7 @@ def main(path, app):
     print("{} = {}".format("resolution", t.resolution))
     print("{} = {}".format("span", t.span))
     print("{} = {}".format("sampling", t.sampling))
-    print("{} = {}".format("image", path))
+    print("{} = {}".format("image", cfg.path))
     print("{} = {}".format("size", original.shape))
     print("------------")
 
@@ -65,7 +65,7 @@ def main(path, app):
 
 if __name__ == '__main__':
     cmd_args = parse_args()
-    original, sinogram, filtered, rec = main(cmd_args.path)
+    original, sinogram, filtered, rec = main(cmd_args)
 
     plt = plotter.Plotter((2,2))
     plt.plot(original, 1)
