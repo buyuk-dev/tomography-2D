@@ -28,7 +28,6 @@ def load_image_normalized(path):
 def main(cfg, app):
     original = load_image_normalized(cfg.path)
     space = numpy.pad(original, 50, 'constant')
-    app.increment_progress()
     t = tomo.Tomograph(cfg.resolution, cfg.sampling, cfg.span)
 
     print("[config]")
@@ -39,28 +38,23 @@ def main(cfg, app):
     print("{} = {}".format("size", original.shape))
     print("------------")
 
-    t.scan(space)
-    app.increment_progress(30)
+    t.scan(space, app)
     print("scan done")
     
     filtered = ramp.filter(t.sinogram, t.resolution)
-    app.increment_progress()
     print("ramp filter applied")
 
     if cfg.filter == "RAMP":
         print("RAMP filter enabled")
-        rec = tomo.backprop(filtered, space.shape, t.sampling, t.span, t.resolution)
+        rec = tomo.backprop(filtered, space.shape, t.sampling, t.span, t.resolution, app)
     else:
-        rec = tomo.backprop(t.sinogram, space.shape, t.sampling, t.span, t.resolution)
-    app.increment_progress(30)
+        rec = tomo.backprop(t.sinogram, space.shape, t.sampling, t.span, t.resolution, app)
     print("reconstruction finished")
 
     rec = rec[50:-50,50:-50]
     rec = numpy.interp(rec, (rec.min(), rec.max()), (0, 255))
-    app.increment_progress()
 
     rms = mathutils.rms_error(original, rec)
-    app.increment_progress()
     print("RMS = {}".format(rms))
 
     return original, t.sinogram, filtered, rec, rms

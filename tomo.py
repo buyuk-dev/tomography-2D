@@ -40,22 +40,29 @@ class Tomograph:
         step = (numpy.pi * 2.0) / self.sampling
         self.angles = [k * step for k in range(self.sampling)]
 
-    def scan(self, space):
+    def scan(self, space, app=None):
         self.space = space
-        self.sinogram = [
-            scan(angle, self.space, self.resolution, self.span)
-            for angle in self.angles
-        ] 
+        self.sinogram = []
+
+        prog_step = 50.0 / len(self.angles)
+        progress = 0
+        for angle in self.angles:
+            row = scan(angle, self.space, self.resolution, self.span)
+            self.sinogram.append(row)
+            progress += prog_step
+            app.set_progress(progress)
         return self.sinogram
 
 
-def backprop(sinogram, size, sampling, span, resolution):
+def backprop(sinogram, size, sampling, span, resolution, app=None):
     height, width = size
     img = [[0] * width for i in range(height)]
 
     step = (numpy.pi * 2.0) / sampling
     angles = [k * step for k in range(sampling)]
 
+    prog_step = 50.0 / len(angles)
+    progress = 0
     for row, source_angle in zip(sinogram, angles):
         w, h = height - 5, width - 5
         center = Point(int(w/2), int(h/2))
@@ -72,5 +79,7 @@ def backprop(sinogram, size, sampling, span, resolution):
             path = bresenham.bresenham_segment(source, detector)
             for p in path:
                 img[p[0]][p[1]] += row[i]
+        progress += prog_step
+        app.set_progress(50 + progress)
     return numpy.array(img)
 

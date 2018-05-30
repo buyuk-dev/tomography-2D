@@ -98,6 +98,9 @@ class GuiApp:
         if self.progress_bar['value'] == self.progress_bar['maximum']:
             print("scanning completed")
 
+    def set_progress(self, val):
+        self.progress_bar['value'] = int(val)
+
     def on_scan(self):
         def scan():
             try:
