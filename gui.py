@@ -10,6 +10,12 @@ import plotter
 import os
 
 
+def select_file(title='select file'):
+    return tkinter.filedialog.askopenfilename(
+        initialdir = os.path.abspath(os.curdir),
+        title = title)
+
+
 class GuiApp:
 
     def __init__(self):
@@ -29,13 +35,7 @@ class GuiApp:
         self.progress_bar.pack(fill=tkinter.X)
         self.progress = 0
 
-        def select_file():
-            self.filename = tkinter.filedialog.askopenfilename(
-                initialdir=os.path.abspath(os.curdir),
-                title='select image'
-            )
-
-        self.path_entry = tkinter.Button(text="browse", command=select_file)
+        self.path_entry = tkinter.Button(text="browse", command=lambda: self.filename = select_file())
         self.path_entry.pack()            
     
         self.frame_params = tkinter.Frame()
